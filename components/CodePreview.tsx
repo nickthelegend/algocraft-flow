@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Download, Copy, Play } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { useState } from "react"
+import Editor from "@monaco-editor/react"
 
 export default function CodePreview({ 
   xml, 
@@ -130,20 +130,33 @@ export default function CodePreview({
       </div>
       
       <div style={{ 
-        flex: 1, 
-        padding: 16, 
-        overflow: "auto" 
+        flex: 1,
+        overflow: "hidden"
       }}>
-        <pre style={{ 
-          whiteSpace: "pre-wrap", 
-          fontFamily: "monospace", 
-          fontSize: 13,
-          lineHeight: 1.6,
-          margin: 0,
-          color: "#e6e6e6"
-        }}>
-          {code || "// Build your contract using blocks"}
-        </pre>
+        <Editor
+          height="100%"
+          defaultLanguage="typescript"
+          value={code || "// Build your contract using blocks"}
+          theme="vs-dark"
+          options={{
+            readOnly: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: "on",
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            wordWrap: "on",
+            padding: { top: 16, bottom: 16 },
+            renderLineHighlight: "none",
+            scrollbar: {
+              vertical: "visible",
+              horizontal: "visible",
+              useShadows: false,
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10
+            }
+          }}
+        />
       </div>
 
       <div style={{ 
