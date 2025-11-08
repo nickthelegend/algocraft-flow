@@ -14,101 +14,149 @@ export default function BlockPicker({
     ;(async () => {
       try {
         const Blockly = await import("blockly")
-        
-        // Load block definitions from examples/blocks.json
         const response = await fetch("/examples/blocks.json")
         const blockDefs = await response.json()
-        
-        // Define blocks with JSON
         Blockly.defineBlocksWithJsonArray(blockDefs)
         
-        // Register generators
         const { javascriptGenerator, Order } = await import("blockly/javascript")
         
-        // Generator for app_create
-        javascriptGenerator.forBlock["app_create"] = function(block: any) {
-          const name = javascriptGenerator.valueToCode(block, "NAME", Order.ATOMIC) || '""'
-          const details = javascriptGenerator.valueToCode(block, "DETAILS", Order.ATOMIC) || '""'
-          const pricing = javascriptGenerator.valueToCode(block, "PRICING", Order.ATOMIC) || "0"
-          const code = `// Create Application\nawait createApplication(${name}, ${details}, ${pricing});\n`
-          return code
+        javascriptGenerator.forBlock["contract_class"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `import { Contract, GlobalState, LocalState, abimethod, uint64, Account, Asset, itxn, Txn, Global, assert } from '@algorandfoundation/algorand-typescript'\n\nexport class ${name} extends Contract {\n${body}}\n`
         }
         
-        // Generator for app_call
-        javascriptGenerator.forBlock["app_call"] = function(block: any) {
-          const appId = javascriptGenerator.valueToCode(block, "APP_ID", Order.ATOMIC) || "0"
-          const method = javascriptGenerator.valueToCode(block, "METHOD", Order.ATOMIC) || '""'
-          const code = `// Call Application\nawait callApplication(${appId}, ${method});\n`
-          return code
-        }
-        
-        // Generator for inner_payment
-        javascriptGenerator.forBlock["inner_payment"] = function(block: any) {
-          const receiver = javascriptGenerator.valueToCode(block, "RECEIVER", Order.ATOMIC) || '""'
-          const amount = javascriptGenerator.valueToCode(block, "AMOUNT", Order.ATOMIC) || "0"
-          const code = `// Payment Transaction\nawait makePayment(${receiver}, ${amount});\n`
-          return code
-        }
-        
-        // Generator for asset_config
-        javascriptGenerator.forBlock["asset_config"] = function(block: any) {
-          const assetName = javascriptGenerator.valueToCode(block, "ASSET_NAME", Order.ATOMIC) || '""'
-          const total = javascriptGenerator.valueToCode(block, "TOTAL", Order.ATOMIC) || "0"
-          const decimals = javascriptGenerator.valueToCode(block, "DECIMALS", Order.ATOMIC) || "0"
-          const code = `// Configure Asset\nawait configureAsset(${assetName}, ${total}, ${decimals});\n`
-          return code
-        }
-        
-        // Generator for global_state
         javascriptGenerator.forBlock["global_state"] = function(block: any) {
-          const key = javascriptGenerator.valueToCode(block, "KEY", Order.ATOMIC) || '""'
-          const code = `getGlobalState(${key})`
-          return [code, Order.FUNCTION_CALL]
+          const name = block.getFieldValue("NAME")
+          const type = block.getFieldValue("TYPE")
+          return `  ${name} = GlobalState<${type}>()\n`
         }
         
-        // Generator for local_state
         javascriptGenerator.forBlock["local_state"] = function(block: any) {
-          const account = javascriptGenerator.valueToCode(block, "ACCOUNT", Order.ATOMIC) || '""'
-          const key = javascriptGenerator.valueToCode(block, "KEY", Order.ATOMIC) || '""'
-          const code = `getLocalState(${account}, ${key})`
-          return [code, Order.FUNCTION_CALL]
+          const name = block.getFieldValue("NAME")
+          const type = block.getFieldValue("TYPE")
+          return `  ${name} = LocalState<${type}>()\n`
         }
         
-        // Generator for text_value
+        javascriptGenerator.forBlock["abimethod"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const params = javascriptGenerator.valueToCode(block, "PARAMS", Order.ATOMIC) || ""
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `  @abimethod()\n  ${name}(${params}): void {\n${body}  }\n\n`
+        }
+        
+        javascriptGenerator.forBlock["assert"] = function(block: any) {
+          const condition = javascriptGenerator.valueToCode(block, "CONDITION", Order.ATOMIC) || "true"
+          return `    assert(${condition})\n`
+        }
+        
+        javascriptGenerator.forBlock["itxn_payment"] = function(block: any) {
+          const receiver = javascriptGenerator.valueToCode(block, "RECEIVER", Order.ATOMIC) || "Txn.sender"
+          const amount = javascriptGenerator.valueToCode(block, "AMOUNT", Order.ATOMIC) || "0"
+          return `    itxn.payment({\n      receiver: ${receiver},\n      amount: ${amount}\n    }).submit()\n`
+        }
+        
+        javascriptGenerator.forBlock["itxn_asset_transfer"] = function(block: any) {
+          const receiver = javascriptGenerator.valueToCode(block, "RECEIVER", Order.ATOMIC) || "Txn.sender"
+          const asset = javascriptGenerator.valueToCode(block, "ASSET", Order.ATOMIC) || "Asset()"
+          const amount = javascriptGenerator.valueToCode(block, "AMOUNT", Order.ATOMIC) || "0"
+          return `    itxn.assetTransfer({\n      assetReceiver: ${receiver},\n      xferAsset: ${asset},\n      assetAmount: ${amount}\n    }).submit()\n`
+        }
+        
+        javascriptGenerator.forBlock["global_current_app_address"] = function() {
+          return ["Global.currentApplicationAddress", Order.MEMBER]
+        }
+        
+        javascriptGenerator.forBlock["global_latest_timestamp"] = function() {
+          return ["Global.latestTimestamp", Order.MEMBER]
+        }
+        
+        javascriptGenerator.forBlock["txn_sender"] = function() {
+          return ["Txn.sender", Order.MEMBER]
+        }
+        
+        javascriptGenerator.forBlock["state_value"] = function(block: any) {
+          const state = block.getFieldValue("STATE")
+          return [`this.${state}.value`, Order.MEMBER]
+        }
+        
+        javascriptGenerator.forBlock["set_state_value"] = function(block: any) {
+          const state = block.getFieldValue("STATE")
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return `    this.${state}.value = ${value}\n`
+        }
+        
         javascriptGenerator.forBlock["text_value"] = function(block: any) {
           const text = block.getFieldValue("TEXT")
-          const code = `"${text}"`
-          return [code, Order.ATOMIC]
+          return [`"${text}"`, Order.ATOMIC]
         }
         
-        // Generator for number_value
         javascriptGenerator.forBlock["number_value"] = function(block: any) {
           const num = block.getFieldValue("NUM")
-          const code = String(num)
-          return [code, Order.ATOMIC]
+          return [String(num), Order.ATOMIC]
         }
         
-        // Build toolbox XML with categories
+        javascriptGenerator.forBlock["comparison"] = function(block: any) {
+          const a = javascriptGenerator.valueToCode(block, "A", Order.RELATIONAL) || "0"
+          const op = block.getFieldValue("OP")
+          const b = javascriptGenerator.valueToCode(block, "B", Order.RELATIONAL) || "0"
+          return [`${a} ${op} ${b}`, Order.RELATIONAL]
+        }
+        
+        javascriptGenerator.forBlock["param_def"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const type = block.getFieldValue("TYPE")
+          return [`${name}: ${type}`, Order.ATOMIC]
+        }
+        
+        javascriptGenerator.forBlock["create_application"] = function(block: any) {
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `  @abimethod()\n  createApplication(): void {\n${body}  }\n\n`
+        }
+        
+        javascriptGenerator.forBlock["const_declaration"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return `    const ${name} = ${value}\n`
+        }
+        
+        javascriptGenerator.forBlock["math_operation"] = function(block: any) {
+          const a = javascriptGenerator.valueToCode(block, "A", Order.ATOMIC) || "0"
+          const op = block.getFieldValue("OP")
+          const b = javascriptGenerator.valueToCode(block, "B", Order.ATOMIC) || "0"
+          return [`${a} ${op} ${b}`, Order.ATOMIC]
+        }
+        
         const categories = [
           {
-            name: "Core",
+            name: "Contract",
             colour: "230",
-            blocks: ["app_create", "app_call"]
-          },
-          {
-            name: "Transactions",
-            colour: "160",
-            blocks: ["inner_payment", "asset_config"]
+            blocks: ["contract_class", "create_application", "abimethod"]
           },
           {
             name: "State",
             colour: "290",
-            blocks: ["global_state", "local_state"]
+            blocks: ["global_state", "local_state", "state_value", "set_state_value"]
+          },
+          {
+            name: "Transactions",
+            colour: "160",
+            blocks: ["itxn_payment", "itxn_asset_transfer"]
+          },
+          {
+            name: "Logic",
+            colour: "0",
+            blocks: ["assert", "comparison"]
+          },
+          {
+            name: "Globals",
+            colour: "290",
+            blocks: ["global_current_app_address", "global_latest_timestamp", "txn_sender"]
           },
           {
             name: "Values",
             colour: "160",
-            blocks: ["text_value", "number_value"]
+            blocks: ["text_value", "number_value", "param_def", "const_declaration", "math_operation"]
           }
         ]
 

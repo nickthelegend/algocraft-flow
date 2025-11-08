@@ -1,85 +1,155 @@
 [
   {
-    "type": "app_create",
-    "message0": "Create Application %1 name %2 details %3 pricing %4",
+    "type": "contract_class",
+    "message0": "Contract %1 %2 %3",
     "args0": [
+      { "type": "field_input", "name": "NAME", "text": "MyContract" },
       { "type": "input_dummy" },
-      { "type": "input_value", "name": "NAME", "check": "String" },
-      { "type": "input_value", "name": "DETAILS", "check": "String" },
-      { "type": "input_value", "name": "PRICING", "check": "Number" }
+      { "type": "input_statement", "name": "BODY" }
     ],
-    "previousStatement": null,
-    "nextStatement": null,
     "colour": 230,
-    "tooltip": "Create a new Algorand application",
-    "helpUrl": ""
-  },
-  {
-    "type": "app_call",
-    "message0": "Call Application %1 app ID %2 method %3",
-    "args0": [
-      { "type": "input_dummy" },
-      { "type": "input_value", "name": "APP_ID", "check": "Number" },
-      { "type": "input_value", "name": "METHOD", "check": "String" }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Call an Algorand application",
-    "helpUrl": ""
-  },
-  {
-    "type": "inner_payment",
-    "message0": "Payment Transaction %1 receiver %2 amount %3",
-    "args0": [
-      { "type": "input_dummy" },
-      { "type": "input_value", "name": "RECEIVER", "check": "String" },
-      { "type": "input_value", "name": "AMOUNT", "check": "Number" }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 160,
-    "tooltip": "Create a payment transaction",
-    "helpUrl": ""
-  },
-  {
-    "type": "asset_config",
-    "message0": "Configure Asset %1 asset name %2 total %3 decimals %4",
-    "args0": [
-      { "type": "input_dummy" },
-      { "type": "input_value", "name": "ASSET_NAME", "check": "String" },
-      { "type": "input_value", "name": "TOTAL", "check": "Number" },
-      { "type": "input_value", "name": "DECIMALS", "check": "Number" }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 160,
-    "tooltip": "Configure an Algorand asset",
+    "tooltip": "Define a contract class",
     "helpUrl": ""
   },
   {
     "type": "global_state",
-    "message0": "Global State %1 key %2",
+    "message0": "GlobalState %1 = %2",
     "args0": [
-      { "type": "input_dummy" },
-      { "type": "input_value", "name": "KEY", "check": "String" }
+      { "type": "field_input", "name": "NAME", "text": "myState" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"],
+        ["Account", "Account"],
+        ["Asset", "Asset"]
+      ]}
     ],
-    "output": null,
+    "previousStatement": null,
+    "nextStatement": null,
     "colour": 290,
-    "tooltip": "Access global state",
+    "tooltip": "Define global state variable",
     "helpUrl": ""
   },
   {
     "type": "local_state",
-    "message0": "Local State %1 account %2 key %3",
+    "message0": "LocalState %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myLocalState" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 290,
+    "tooltip": "Define local state variable",
+    "helpUrl": ""
+  },
+  {
+    "type": "abimethod",
+    "message0": "@abimethod %1 %2 ( %3 ) %4 %5",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myMethod" },
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "PARAMS", "check": "String" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Define an ABI method",
+    "helpUrl": ""
+  },
+  {
+    "type": "assert",
+    "message0": "assert %1",
+    "args0": [
+      { "type": "input_value", "name": "CONDITION" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "Assert a condition",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_payment",
+    "message0": "itxn.payment %1 receiver: %2 amount: %3 %4 .submit()",
     "args0": [
       { "type": "input_dummy" },
-      { "type": "input_value", "name": "ACCOUNT", "check": "String" },
-      { "type": "input_value", "name": "KEY", "check": "String" }
+      { "type": "input_value", "name": "RECEIVER" },
+      { "type": "input_value", "name": "AMOUNT" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Create inner payment transaction",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_transfer",
+    "message0": "itxn.assetTransfer %1 assetReceiver: %2 xferAsset: %3 assetAmount: %4 %5 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "RECEIVER" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "input_value", "name": "AMOUNT" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Create inner asset transfer transaction",
+    "helpUrl": ""
+  },
+  {
+    "type": "global_current_app_address",
+    "message0": "Global.currentApplicationAddress",
+    "output": null,
+    "colour": 290,
+    "tooltip": "Current application address",
+    "helpUrl": ""
+  },
+  {
+    "type": "global_latest_timestamp",
+    "message0": "Global.latestTimestamp",
+    "output": "Number",
+    "colour": 290,
+    "tooltip": "Latest timestamp",
+    "helpUrl": ""
+  },
+  {
+    "type": "txn_sender",
+    "message0": "Txn.sender",
+    "output": null,
+    "colour": 290,
+    "tooltip": "Transaction sender",
+    "helpUrl": ""
+  },
+  {
+    "type": "state_value",
+    "message0": "this.%1.value",
+    "args0": [
+      { "type": "field_input", "name": "STATE", "text": "myState" }
     ],
     "output": null,
     "colour": 290,
-    "tooltip": "Access local state",
+    "tooltip": "Access state value",
+    "helpUrl": ""
+  },
+  {
+    "type": "set_state_value",
+    "message0": "this.%1.value = %2",
+    "args0": [
+      { "type": "field_input", "name": "STATE", "text": "myState" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 290,
+    "tooltip": "Set state value",
     "helpUrl": ""
   },
   {
@@ -102,6 +172,88 @@
     "output": "Number",
     "colour": 230,
     "tooltip": "Number value",
+    "helpUrl": ""
+  },
+  {
+    "type": "comparison",
+    "message0": "%1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "A" },
+      { "type": "field_dropdown", "name": "OP", "options": [
+        ["==", "==="],
+        ["!=", "!=="],
+        [">", ">"],
+        ["<", "<"],
+        [">=", ">="],
+        ["<=", "<="]
+      ]},
+      { "type": "input_value", "name": "B" }
+    ],
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Compare two values",
+    "helpUrl": ""
+  },
+  {
+    "type": "param_def",
+    "message0": "%1: %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "param" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"],
+        ["Account", "Account"],
+        ["Asset", "Asset"],
+        ["gtxn.PaymentTxn", "gtxn.PaymentTxn"]
+      ]}
+    ],
+    "output": "String",
+    "colour": 230,
+    "tooltip": "Method parameter",
+    "helpUrl": ""
+  },
+  {
+    "type": "create_application",
+    "message0": "@abimethod() createApplication %1 %2",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Create application initialization method",
+    "helpUrl": ""
+  },
+  {
+    "type": "const_declaration",
+    "message0": "const %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myVar" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Declare a constant",
+    "helpUrl": ""
+  },
+  {
+    "type": "math_operation",
+    "message0": "%1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "A" },
+      { "type": "field_dropdown", "name": "OP", "options": [
+        ["+", "+"],
+        ["-", "-"],
+        ["*", "*"],
+        ["/", "/"]
+      ]},
+      { "type": "input_value", "name": "B" }
+    ],
+    "output": "Number",
+    "colour": 230,
+    "tooltip": "Math operation",
     "helpUrl": ""
   }
 ]

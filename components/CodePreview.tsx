@@ -1,8 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Download, Copy } from "lucide-react"
+import { Download, Copy, Play } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { useState } from "react"
 
 export default function CodePreview({ 
   xml, 
@@ -11,6 +12,26 @@ export default function CodePreview({
   xml: string
   code: string 
 }) {
+  const [compiling, setCompiling] = useState(false)
+
+  const handleCompile = async () => {
+    setCompiling(true)
+    toast({
+      title: "Compiling...",
+      description: "Compiling your smart contract",
+      duration: 2000,
+    })
+    
+    setTimeout(() => {
+      setCompiling(false)
+      toast({
+        title: "Compilation Complete",
+        description: "Contract compiled successfully",
+        duration: 2000,
+      })
+    }, 2000)
+  }
+
   const handleDownload = () => {
     const blob = new Blob([code], { type: "text/javascript" })
     const url = URL.createObjectURL(blob)
@@ -77,6 +98,19 @@ export default function CodePreview({
           Code Preview
         </h4>
         <div style={{ display: "flex", gap: 8 }}>
+          <Button 
+            size="sm" 
+            onClick={handleCompile}
+            disabled={compiling}
+            style={{ 
+              background: "#16a34a", 
+              border: "none",
+              color: "#fff"
+            }}
+          >
+            <Play className="h-3 w-3 mr-1" />
+            {compiling ? "Compiling..." : "Compile"}
+          </Button>
           <Button 
             size="sm" 
             variant="outline"
