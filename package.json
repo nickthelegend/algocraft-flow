@@ -46,6 +46,7 @@
     "@vercel/analytics": "1.3.1",
     "@walletconnect/modal": "latest",
     "@walletconnect/sign-client": "latest",
+    "@xyflow/react": "^12.9.2",
     "algosdk": "latest",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
