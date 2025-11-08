@@ -23,7 +23,7 @@ export default function BlockPicker({
         javascriptGenerator.forBlock["contract_class"] = function(block: any) {
           const name = block.getFieldValue("NAME")
           const body = javascriptGenerator.statementToCode(block, "BODY")
-          return `import { Contract, GlobalState, LocalState, Box, BoxMap, abimethod, uint64, Account, Asset, itxn, Txn, Global, assert, gtxn } from '@algorandfoundation/algorand-typescript'\n\nexport class ${name} extends Contract {\n${body}}\n`
+          return `import { Contract, GlobalState, LocalState, Box, BoxMap, abimethod, uint64, bytes, Account, Asset, Application, itxn, Txn, Global, assert, log, gtxn, Uint64, BigUint, Bytes } from '@algorandfoundation/algorand-typescript'\n\nexport class ${name} extends Contract {\n${body}}\n`
         }
         
         javascriptGenerator.forBlock["global_state"] = function(block: any) {
@@ -48,6 +48,11 @@ export default function BlockPicker({
         javascriptGenerator.forBlock["assert"] = function(block: any) {
           const condition = javascriptGenerator.valueToCode(block, "CONDITION", Order.ATOMIC) || "true"
           return `    assert(${condition})\n`
+        }
+        
+        javascriptGenerator.forBlock["log"] = function(block: any) {
+          const message = javascriptGenerator.valueToCode(block, "MESSAGE", Order.ATOMIC) || '""'
+          return `    log(${message})\n`
         }
         
         javascriptGenerator.forBlock["itxn_payment"] = function(block: any) {
@@ -112,7 +117,27 @@ export default function BlockPicker({
         javascriptGenerator.forBlock["create_application"] = function(block: any) {
           const params = javascriptGenerator.valueToCode(block, "PARAMS", Order.ATOMIC) || ""
           const body = javascriptGenerator.statementToCode(block, "BODY")
-          return `  @abimethod()\n  createApplication(${params}): void {\n${body}  }\n\n`
+          return `  createApplication(${params}): void {\n${body}  }\n\n`
+        }
+        
+        javascriptGenerator.forBlock["update_application"] = function(block: any) {
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `  updateApplication(): void {\n${body}  }\n\n`
+        }
+        
+        javascriptGenerator.forBlock["delete_application"] = function(block: any) {
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `  deleteApplication(): void {\n${body}  }\n\n`
+        }
+        
+        javascriptGenerator.forBlock["optin_application"] = function(block: any) {
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `  optInToApplication(): void {\n${body}  }\n\n`
+        }
+        
+        javascriptGenerator.forBlock["closeout_application"] = function(block: any) {
+          const body = javascriptGenerator.statementToCode(block, "BODY")
+          return `  closeOutOfApplication(): void {\n${body}  }\n\n`
         }
         
         javascriptGenerator.forBlock["itxn_asset_create"] = function(block: any) {
@@ -251,11 +276,64 @@ export default function BlockPicker({
           return `    this.${box}.delete()\n`
         }
         
+        javascriptGenerator.forBlock["uint64_factory"] = function(block: any) {
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return [`Uint64(${value})`, Order.FUNCTION_CALL]
+        }
+        
+        javascriptGenerator.forBlock["biguint_factory"] = function(block: any) {
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return [`BigUint(${value})`, Order.FUNCTION_CALL]
+        }
+        
+        javascriptGenerator.forBlock["bytes_factory"] = function(block: any) {
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || '""'
+          return [`Bytes(${value})`, Order.FUNCTION_CALL]
+        }
+        
+        javascriptGenerator.forBlock["account_factory"] = function(block: any) {
+          const address = javascriptGenerator.valueToCode(block, "ADDRESS", Order.ATOMIC) || '""'
+          return [`Account(${address})`, Order.FUNCTION_CALL]
+        }
+        
+        javascriptGenerator.forBlock["asset_factory"] = function(block: any) {
+          const id = javascriptGenerator.valueToCode(block, "ID", Order.ATOMIC) || "0"
+          return [`Asset(${id})`, Order.FUNCTION_CALL]
+        }
+        
+        javascriptGenerator.forBlock["application_factory"] = function(block: any) {
+          const id = javascriptGenerator.valueToCode(block, "ID", Order.ATOMIC) || "0"
+          return [`Application(${id})`, Order.FUNCTION_CALL]
+        }
+        
+        javascriptGenerator.forBlock["let_declaration"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const type = block.getFieldValue("TYPE")
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return `    let ${name}: ${type} = ${value}\n`
+        }
+        
+        javascriptGenerator.forBlock["variable_get"] = function(block: any) {
+          const varName = block.getFieldValue("VAR")
+          return [varName, Order.ATOMIC]
+        }
+        
+        javascriptGenerator.forBlock["variable_set"] = function(block: any) {
+          const varName = block.getFieldValue("VAR")
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return `    ${varName} = ${value}\n`
+        }
+        
         const categories = [
           {
             name: "Contract",
             colour: "230",
-            blocks: ["contract_class", "create_application", "abimethod"]
+            blocks: ["contract_class", "abimethod"]
+          },
+          {
+            name: "Lifecycle",
+            colour: "120",
+            blocks: ["create_application", "update_application", "delete_application", "optin_application", "closeout_application"]
           },
           {
             name: "State",
@@ -275,7 +353,7 @@ export default function BlockPicker({
           {
             name: "Logic",
             colour: "210",
-            blocks: ["assert", "comparison", "logical_operation", "if_statement", "if_else_statement", "while_loop", "for_loop", "return_statement", "break_statement", "continue_statement"]
+            blocks: ["assert", "log", "comparison", "logical_operation", "if_statement", "if_else_statement", "while_loop", "for_loop", "return_statement", "break_statement", "continue_statement"]
           },
           {
             name: "Globals",
@@ -283,9 +361,14 @@ export default function BlockPicker({
             blocks: ["global_current_app_address", "global_latest_timestamp", "txn_sender"]
           },
           {
+            name: "Types",
+            colour: "230",
+            blocks: ["uint64_factory", "biguint_factory", "bytes_factory", "account_factory", "asset_factory", "application_factory"]
+          },
+          {
             name: "Values",
             colour: "160",
-            blocks: ["text_value", "number_value", "param_def", "const_declaration", "math_operation"]
+            blocks: ["text_value", "number_value", "param_def", "const_declaration", "let_declaration", "variable_get", "variable_set", "math_operation"]
           }
         ]
 
