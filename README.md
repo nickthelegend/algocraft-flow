@@ -1,114 +1,87 @@
-# AlgoKYC - Decentralized KYC with ZK Proof
+# AlgoFlow - Visual Algorand Smart Contract & Transaction Builder
 
-A decentralized KYC (Know Your Customer) verification system built on Algorand blockchain with zero-knowledge proofs for enhanced privacy.
-
-![AlgoKYC](https://placeholder.svg?height=400&width=800&query=Decentralized+KYC+Verification+Platform+with+ZK+Proofs)
+A visual, node-based development environment for building and deploying Algorand smart contracts and transactions without writing code.
 
 ## Overview
 
-AlgoKYC is a cutting-edge solution that combines the security of blockchain technology with the privacy of zero-knowledge proofs to create a decentralized KYC verification system. This platform allows users to verify their identity once and share their verification status with multiple third parties without revealing sensitive personal information.
+AlgoFlow is a powerful visual programming platform that enables developers to create Algorand blockchain applications using an intuitive drag-and-drop interface. Build smart contracts, compose transactions, and deploy to the Algorand network - all through a visual flow builder.
 
 ## Key Features
 
-- **Decentralized Identity Verification**: Verify your identity on the Algorand blockchain
-- **Zero-Knowledge Proofs**: Share verification status without revealing personal data
-- **Third-Party Verification History**: Track which services have accessed your KYC status
-- **Multiple Verification Levels**: Support for different KYC levels based on requirements
-- **Secure Wallet Integration**: Connect with popular Algorand wallets
-- **Dark/Light Mode**: User-friendly interface with theme options
+- **Visual Flow Builder**: Drag-and-drop interface for building Algorand applications
+- **Smart Contract Builder**: Create and deploy smart contracts visually
+- **Transaction Composer**: Build complex transaction flows without code
+- **Live Code Generation**: See JavaScript code generated in real-time
+- **Wallet Integration**: Connect with Algorand wallets (Pera, Defly, Exodus, Lute)
+- **Built-in Terminal**: Execute and test your flows directly in the browser
+- **Dark/Light Mode**: Comfortable development environment
 
 ## Technology Stack
 
 - **Frontend**: Next.js 14 with App Router
 - **UI Components**: shadcn/ui with Tailwind CSS
-- **Animations**: Framer Motion
-- **Blockchain**: Algorand
-- **Wallet Integration**: TXN Lab's use-wallet-react
-- **Zero-Knowledge Proofs**: ZK libraries (implementation details)
+- **Flow Editor**: React Flow
+- **Blockchain**: Algorand SDK (algosdk)
+- **Wallet Integration**: Algorand wallets
+- **Code Generation**: Custom AST-based generator
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ installed
-- Basic understanding of React and Next.js
-- An Algorand wallet (Pera, Defly, Exodus, or Lute)
+- npm, yarn, or pnpm package manager
+- An Algorand wallet (optional, for testing)
 
 ### Installation
 
 1. Clone this repository:
-   \`\`\`bash
-   git clone https://github.com/yourusername/algokyc.git
-   cd algokyc
-   \`\`\`
+   ```bash
+   git clone https://github.com/yourusername/algoflow.git
+   cd algoflow
+   ```
 
 2. Install dependencies:
-   \`\`\`bash
+   ```bash
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   \`\`\`
+   ```
 
 3. Run the development server:
-   \`\`\`bash
+   ```bash
    npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   \`\`\`
+   ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
 ## Project Structure
 
-\`\`\`
-├── app/                  # Next.js App Router
-│   ├── dashboard/        # Dashboard pages
-│   │   ├── fill-kyc/     # KYC form page
-│   │   └── page.tsx      # Dashboard main page
-│   ├── globals.css       # Global styles
-│   ├── layout.tsx        # Root layout with providers
-│   └── page.tsx          # Home page with hero section
-├── components/           # React components
-│   ├── connect-wallet-button.tsx  # Wallet connection button
-│   ├── connect-wallet-modal.tsx   # Wallet selection modal
-│   ├── footer.tsx        # Site footer
-│   ├── kyc-status.tsx    # KYC status component
-│   ├── nav.tsx           # Navigation bar
-│   ├── providers.tsx     # Wallet providers setup
-│   ├── theme-toggle.tsx  # Dark/light mode toggle
-│   └── verification-history.tsx   # 3rd party verification history
+```
+├── app/
+│   ├── build/
+│   │   ├── contracts/    # Smart contract builder
+│   │   └── transactions/ # Transaction builder
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Home page
+├── components/
+│   ├── flow-builder.tsx  # Main flow editor
+│   ├── node-sidebar.tsx  # Node palette
+│   ├── wallet-panel.tsx  # Wallet interface
+│   ├── terminalbuild.tsx # Execution terminal
+│   └── ui/               # UI components
+├── lib/
+│   └── code-generator.ts # Code generation engine
 └── public/               # Static assets
-\`\`\`
+```
 
-## Features in Detail
+## Quick Start
 
-### KYC Dashboard
+1. **Create a Wallet**: Click the wallet button to generate a new Algorand wallet
+2. **Build a Flow**: Drag nodes from the sidebar onto the canvas
+3. **Connect Nodes**: Link nodes together to create your logic flow
+4. **Deploy**: Click "Deploy Contract" or "Run Flow" to execute
+5. **Export Code**: Download the generated JavaScript code
 
-The dashboard provides a comprehensive view of your KYC status:
-
-- **KYC Status**: View your current verification status, level, and submission details
-- **Verification History**: Track which third parties have accessed your KYC information
-- **Fill KYC**: Complete or update your KYC information
-
-### Zero-Knowledge Proofs
-
-AlgoKYC uses zero-knowledge proofs to allow users to prove their identity without revealing sensitive information:
-
-- Verify age without revealing date of birth
-- Confirm address without exposing exact location
-- Validate identity without sharing personal documents
-
-### Third-Party Integration
-
-Services can integrate with AlgoKYC to verify users without handling sensitive data:
-
-- API for verification status checks
-- Webhook notifications for status changes
-- SDK for seamless integration
+For detailed instructions, see [FULL_guide.md](./FULL_guide.md)
 
 ## Contributing
 
@@ -118,10 +91,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Documentation
+
+- [Full Guide](./FULL_guide.md) - Complete documentation
+- [Algorand Docs](https://developer.algorand.org/)
+
 ## Acknowledgments
 
 - [Algorand](https://www.algorand.com/)
 - [Next.js](https://nextjs.org/)
-- [TXN Lab's use-wallet-react](https://github.com/TxnLab/use-wallet-react)
+- [React Flow](https://reactflow.dev/)
 - [shadcn/ui](https://ui.shadcn.com/)
-- [Framer Motion](https://www.framer.com/motion/)
