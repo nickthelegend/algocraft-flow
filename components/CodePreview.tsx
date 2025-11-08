@@ -12,24 +12,16 @@ export default function CodePreview({
   xml: string
   code: string 
 }) {
-  const [compiling, setCompiling] = useState(false)
 
-  const handleCompile = async () => {
-    setCompiling(true)
+  const handleOpenInIDE = () => {
+    const base64Code = btoa(code)
+    const url = `http://localhost:3001/api/load-contract?contract=${encodeURIComponent(base64Code)}`
+    window.open(url, '_blank')
     toast({
-      title: "Compiling...",
-      description: "Compiling your smart contract",
+      title: "Opening in IDE",
+      description: "Loading contract in external IDE",
       duration: 2000,
     })
-    
-    setTimeout(() => {
-      setCompiling(false)
-      toast({
-        title: "Compilation Complete",
-        description: "Contract compiled successfully",
-        duration: 2000,
-      })
-    }, 2000)
   }
 
   const handleDownload = () => {
@@ -100,8 +92,7 @@ export default function CodePreview({
         <div style={{ display: "flex", gap: 8 }}>
           <Button 
             size="sm" 
-            onClick={handleCompile}
-            disabled={compiling}
+            onClick={handleOpenInIDE}
             style={{ 
               background: "#16a34a", 
               border: "none",
@@ -109,7 +100,7 @@ export default function CodePreview({
             }}
           >
             <Play className="h-3 w-3 mr-1" />
-            {compiling ? "Compiling..." : "Compile"}
+            Open in IDE
           </Button>
           <Button 
             size="sm" 
