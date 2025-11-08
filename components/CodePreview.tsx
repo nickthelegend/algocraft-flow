@@ -15,7 +15,7 @@ export default function CodePreview({
 
   const handleOpenInIDE = () => {
     const base64Code = btoa(code)
-    const url = `http://localhost:3001/api/load-contract?contract=${encodeURIComponent(base64Code)}`
+    const url = `http://ide.algocraft.fun/api/load-contract?contract=${encodeURIComponent(base64Code)}`
     window.open(url, '_blank')
     toast({
       title: "Opening in IDE",

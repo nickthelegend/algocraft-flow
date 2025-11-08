@@ -15,6 +15,7 @@ export default function Nav() {
     { href: "/", label: "Home" },
     { href: "/build/transactions", label: "Build Transactions" },
     { href: "/build/contracts", label: "Build Contracts" },
+    { href: "/build/contracts/noob", label: "🎮 Easy Mode" },
     { href: "/docs", label: "Docs" },
   ]
 
