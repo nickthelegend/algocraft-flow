@@ -64,14 +64,29 @@ export default function TransactionsPage() {
       .replace("const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);", "")
       .replace("const params = await algodClient.getTransactionParams().do();", "")
 
-    let capturedOutput = ""
     const originalConsoleLog = console.log
+    const originalConsoleError = console.error
+    const originalConsoleWarn = console.warn
+    
     console.log = (...args) => {
-      const msg = args.join(" ")
-      capturedOutput += msg + "\n"
+      const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(" ")
       logs += `[LOG] ${msg}\n`
       setTerminalOutput(logs)
       originalConsoleLog.apply(console, args)
+    }
+    
+    console.error = (...args) => {
+      const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(" ")
+      logs += `[ERROR] ${msg}\n`
+      setTerminalOutput(logs)
+      originalConsoleError.apply(console, args)
+    }
+    
+    console.warn = (...args) => {
+      const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(" ")
+      logs += `[WARN] ${msg}\n`
+      setTerminalOutput(logs)
+      originalConsoleWarn.apply(console, args)
     }
 
     try {
@@ -91,16 +106,22 @@ export default function TransactionsPage() {
       
       logs += `[INFO] Current round: ${params.firstRound}\n`
       logs += `[INFO] Fee: ${params.fee} microAlgos\n`
-      logs += "[INFO] Executing generated code...\n"
+      logs += `[INFO] Genesis ID: ${params.genesisID}\n`
+      logs += "[INFO] Executing transaction flow...\n"
+      logs += "-----------------------------------\n"
       setTerminalOutput(logs)
 
       const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
       const runnableCode = new AsyncFunction('algosdk', 'algodClient', 'params', modifiedGeneratedCode)
       
-      await runnableCode(algosdk, algodClient, params)
+      const result = await runnableCode(algosdk, algodClient, params)
+      
+      if (result !== undefined) {
+        logs += `[RESULT] ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}\n`
+      }
 
-      logs += capturedOutput
-      logs += "\n[SUCCESS] Flow execution completed successfully!\n"
+      logs += "-----------------------------------\n"
+      logs += "[SUCCESS] Flow execution completed successfully!\n"
       setTerminalOutput(logs)
       
       toast({
@@ -109,9 +130,15 @@ export default function TransactionsPage() {
         duration: 3000,
       })
     } catch (error: any) {
-      logs += capturedOutput
-      logs += `\n[ERROR] ${error.message}\n`
-      logs += `[ERROR] Stack: ${error.stack || 'No stack trace'}\n`
+      logs += "-----------------------------------\n"
+      logs += `[ERROR] Execution failed: ${error.message}\n`
+      if (error.response) {
+        logs += `[ERROR] Response: ${JSON.stringify(error.response, null, 2)}\n`
+      }
+      if (error.stack) {
+        logs += `[ERROR] Stack trace:\n${error.stack}\n`
+      }
+      logs += "-----------------------------------\n"
       setTerminalOutput(logs)
       
       toast({
@@ -122,6 +149,8 @@ export default function TransactionsPage() {
       })
     } finally {
       console.log = originalConsoleLog
+      console.error = originalConsoleError
+      console.warn = originalConsoleWarn
     }
   }
 
@@ -224,21 +253,7 @@ export default function TransactionsPage() {
         </PanelGroup>
       </div>
 
-      <div className="fixed bottom-4 right-4 z-50 flex gap-2">
-        <Button
-          onClick={() => setIsTerminalOpen(!isTerminalOpen)}
-          className="px-4 py-2 rounded-lg shadow-lg transition-all duration-200"
-          style={{
-            backgroundColor: isTerminalOpen ? "var(--button-color)" : "var(--sidebar-color)",
-            color: "var(--text-color)",
-            border: "1px solid var(--border-color)",
-          }}
-          size="sm"
-        >
-          <TerminalIcon className="h-4 w-4 mr-2" />
-          Terminal
-        </Button>
-      </div>
+
 
       <TerminalBuild isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} output={terminalOutput} />
     </div>
