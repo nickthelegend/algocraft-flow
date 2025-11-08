@@ -49,12 +49,12 @@ export function WalletPanel({ wallet, onClose }: WalletPanelProps) {
   // Algorand Network URLs
   const NETWORK_CONFIG = {
     testnet: {
-      indexer: "https://testnet-api.algonode.cloud",
+      indexer: "https://testnet-idx.algonode.cloud",
       algod: "https://testnet-api.algonode.cloud",
       explorer: "https://testnet.algoexplorer.io"
     },
     mainnet: {
-      indexer: "https://mainnet-api.algonode.cloud", 
+      indexer: "https://mainnet-idx.algonode.cloud", 
       algod: "https://mainnet-api.algonode.cloud",
       explorer: "https://algoexplorer.io"
     }
@@ -82,18 +82,18 @@ export function WalletPanel({ wallet, onClose }: WalletPanelProps) {
 
     try {
       // Fetch account info to get balance
-      const accountResponse = await fetch(`${currentNetwork.indexer}/v2/accounts/${wallet.address}`)
+      const accountResponse = await fetch(`${currentNetwork.algod}/v2/accounts/${wallet.address}`)
       if (!accountResponse.ok) {
         throw new Error(`Failed to fetch account info: ${accountResponse.status}`)
       }
       
       const accountData = await accountResponse.json()
-      const balance = accountData.account.amount || 0
+      const balance = accountData.amount || 0
       setRealBalance(balance)
 
       // Fetch recent transactions
       const txnsResponse = await fetch(
-        `${currentNetwork.indexer}/v2/accounts/${wallet.address}/transactions?limit=20&order=desc`
+        `${currentNetwork.indexer}/v2/transactions?address=${wallet.address}&limit=20`
       )
       
       if (!txnsResponse.ok) {

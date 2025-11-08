@@ -106,7 +106,7 @@ export function NodeSidebar({ type }: NodeSidebarProps) {
   )
 
   return (
-    <div className="w-80 h-full bg-gray-900/95 backdrop-blur-lg border-r border-gray-700 flex flex-col overflow-hidden">
+    <div className="w-64 h-full bg-gray-900/95 backdrop-blur-lg border-r border-gray-700 flex flex-col overflow-hidden">
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-white text-lg font-semibold">
