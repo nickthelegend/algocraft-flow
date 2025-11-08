@@ -23,7 +23,7 @@ export default function BlockPicker({
         javascriptGenerator.forBlock["contract_class"] = function(block: any) {
           const name = block.getFieldValue("NAME")
           const body = javascriptGenerator.statementToCode(block, "BODY")
-          return `import { Contract, GlobalState, LocalState, abimethod, uint64, Account, Asset, itxn, Txn, Global, assert } from '@algorandfoundation/algorand-typescript'\n\nexport class ${name} extends Contract {\n${body}}\n`
+          return `import { Contract, GlobalState, LocalState, Box, BoxMap, abimethod, uint64, Account, Asset, itxn, Txn, Global, assert, gtxn } from '@algorandfoundation/algorand-typescript'\n\nexport class ${name} extends Contract {\n${body}}\n`
         }
         
         javascriptGenerator.forBlock["global_state"] = function(block: any) {
@@ -218,6 +218,39 @@ export default function BlockPicker({
           return [`${a} ${op} ${b}`, Order.LOGICAL_AND]
         }
         
+        javascriptGenerator.forBlock["box_storage"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const type = block.getFieldValue("TYPE")
+          return `  ${name} = Box<${type}>({ key: '${name}' })\n`
+        }
+        
+        javascriptGenerator.forBlock["box_map"] = function(block: any) {
+          const name = block.getFieldValue("NAME")
+          const type = block.getFieldValue("TYPE")
+          return `  ${name} = BoxMap${type}({ keyPrefix: '' })\n`
+        }
+        
+        javascriptGenerator.forBlock["box_value"] = function(block: any) {
+          const box = block.getFieldValue("BOX")
+          return [`this.${box}.value`, Order.MEMBER]
+        }
+        
+        javascriptGenerator.forBlock["set_box_value"] = function(block: any) {
+          const box = block.getFieldValue("BOX")
+          const value = javascriptGenerator.valueToCode(block, "VALUE", Order.ATOMIC) || "0"
+          return `    this.${box}.value = ${value}\n`
+        }
+        
+        javascriptGenerator.forBlock["box_exists"] = function(block: any) {
+          const box = block.getFieldValue("BOX")
+          return [`this.${box}.exists`, Order.MEMBER]
+        }
+        
+        javascriptGenerator.forBlock["box_delete"] = function(block: any) {
+          const box = block.getFieldValue("BOX")
+          return `    this.${box}.delete()\n`
+        }
+        
         const categories = [
           {
             name: "Contract",
@@ -228,6 +261,11 @@ export default function BlockPicker({
             name: "State",
             colour: "290",
             blocks: ["global_state", "local_state", "state_value", "set_state_value"]
+          },
+          {
+            name: "Storage",
+            colour: "260",
+            blocks: ["box_storage", "box_map", "box_value", "set_box_value", "box_exists", "box_delete"]
           },
           {
             name: "Transactions",

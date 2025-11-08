@@ -470,5 +470,86 @@
     "colour": 210,
     "tooltip": "Logical operation",
     "helpUrl": ""
+  },
+  {
+    "type": "box_storage",
+    "message0": "Box %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myBox" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["string", "string"],
+        ["uint64", "uint64"],
+        ["bytes", "bytes"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Define box storage",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_map",
+    "message0": "BoxMap %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myBoxMap" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["<Account, uint64>", "<Account, uint64>"],
+        ["<uint64, string>", "<uint64, string>"],
+        ["<string, bytes>", "<string, bytes>"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Define box map storage",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_value",
+    "message0": "this.%1.value",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" }
+    ],
+    "output": null,
+    "colour": 260,
+    "tooltip": "Access box value",
+    "helpUrl": ""
+  },
+  {
+    "type": "set_box_value",
+    "message0": "this.%1.value = %2",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Set box value",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_exists",
+    "message0": "this.%1.exists",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" }
+    ],
+    "output": "Boolean",
+    "colour": 260,
+    "tooltip": "Check if box exists",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_delete",
+    "message0": "this.%1.delete()",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Delete box",
+    "helpUrl": ""
   }
 ]
