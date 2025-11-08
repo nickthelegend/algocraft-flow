@@ -49,6 +49,9 @@ export default function TransactionsPage() {
     setTerminalOutput("")
     setIsTerminalOpen(true)
 
+    let logs = "[INFO] Starting transaction flow execution...\n"
+    setTerminalOutput(logs)
+
     toast({
       title: "Running Flow",
       description: "Your Algorand flow is being executed...",
@@ -64,31 +67,53 @@ export default function TransactionsPage() {
     let capturedOutput = ""
     const originalConsoleLog = console.log
     console.log = (...args) => {
-      capturedOutput += args.join(" ") + "\n"
+      const msg = args.join(" ")
+      capturedOutput += msg + "\n"
+      logs += `[LOG] ${msg}\n`
+      setTerminalOutput(logs)
       originalConsoleLog.apply(console, args)
     }
 
     try {
+      logs += "[INFO] Connecting to Algorand TestNet...\n"
+      setTerminalOutput(logs)
+
       const algodToken = 'YOUR_ALGOD_API_TOKEN'
       const algodServer = 'https://testnet-api.algonode.cloud'
       const algodPort = ''
 
       const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort)
+      
+      logs += "[INFO] Fetching transaction parameters...\n"
+      setTerminalOutput(logs)
+      
       const params = await algodClient.getTransactionParams().do()
+      
+      logs += `[INFO] Current round: ${params.firstRound}\n`
+      logs += `[INFO] Fee: ${params.fee} microAlgos\n`
+      logs += "[INFO] Executing generated code...\n"
+      setTerminalOutput(logs)
 
       const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
       const runnableCode = new AsyncFunction('algosdk', 'algodClient', 'params', modifiedGeneratedCode)
       
       await runnableCode(algosdk, algodClient, params)
 
-      setTerminalOutput(capturedOutput)
+      logs += capturedOutput
+      logs += "\n[SUCCESS] Flow execution completed successfully!\n"
+      setTerminalOutput(logs)
+      
       toast({
         title: "Flow Execution Complete",
         description: "Check terminal for output.",
         duration: 3000,
       })
     } catch (error: any) {
-      setTerminalOutput(capturedOutput + `\nError: ${error.message}`)
+      logs += capturedOutput
+      logs += `\n[ERROR] ${error.message}\n`
+      logs += `[ERROR] Stack: ${error.stack || 'No stack trace'}\n`
+      setTerminalOutput(logs)
+      
       toast({
         title: "Flow Execution Failed",
         description: error.message,
